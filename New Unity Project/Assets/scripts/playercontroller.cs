@@ -17,10 +17,36 @@ public class playercontroller : MonoBehaviour
     private float activeMoveSpeed = 4;//実際の移動速度
 
 
+
+    public Vector3 jumpForce = new Vector3(0, 6, 0);//ジャンプ力 
+    public Transform groundCheckPoint;//地面に向けてレイを飛ばすオブジェクト 
+    public LayerMask groundLayers;//地面だと認識するレイヤー 
+    Rigidbody rb;//
+
+
+    public float walkSpeed = 4f, runSpeed = 8f;//歩きの速度、走りの速度
+
+
+    private bool cursorLock = true;//カーソルの表示/非表示 
+
+
+
+    public List<Gun> guns = new List<Gun>();//武器の格納配列
+    private int selectedGun = 0;//選択中の武器管理用数値
+
+
     private void Start()
     {
         //変数にメインカメラを格納
         cam = Camera.main;
+
+
+        //Rigidbodyを格納
+        rb = GetComponent<Rigidbody>();
+
+
+        //カーソル非表示
+        UpdateCursorLock();
     }
 
     private void Update()
@@ -30,6 +56,22 @@ public class playercontroller : MonoBehaviour
 
         //移動関数
         PlayerMove();
+
+        //地面についているのか判定をする
+        if (IsGround())
+        {
+            //走りの関数を呼ぶ
+            Run();
+
+            //ジャンプ関数を呼ぶ
+            Jump();
+        }
+
+        //銃の切り替え
+        SwitchingGuns();
+
+        //カーソル非表示
+        UpdateCursorLock();
     }
 
     //Update関数が呼ばれた後に実行される
@@ -87,5 +129,113 @@ public class playercontroller : MonoBehaviour
 
         //現在位置に進む方向＊移動スピード＊フレーム間秒数を足す
         transform.position += movement * activeMoveSpeed * Time.deltaTime;
+    }
+
+
+    /// <summary>
+    /// 地面についているならtrue
+    /// </summary>
+    /// <returns></returns>
+    public bool IsGround()
+    {
+        return Physics.Raycast(groundCheckPoint.position, Vector3.down, 0.25f, groundLayers);
+    }
+
+
+    public void Jump()
+    {
+        //ジャンプできるのか判定
+        if (IsGround() && Input.GetKeyDown(KeyCode.Space))
+        {
+            //瞬間的に真上に力を加える
+            rb.AddForce(jumpForce, ForceMode.Impulse);
+        }
+    }
+
+
+    public void Run()
+    {
+        //左シフトを押しているときはスピードを切り替える
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            activeMoveSpeed = runSpeed;
+        }
+        else
+        {
+            activeMoveSpeed = walkSpeed;
+        }
+    }
+
+
+    public void UpdateCursorLock()
+    {
+        //入力しだいでcursorLockを切り替える
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            cursorLock = false;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            cursorLock = true;
+        }
+
+        //cursorLock次第でカーソルの表示を切り替える
+        if (cursorLock)
+        {
+            //カーソルを中央に固定し、非表示　https://docs.unity3d.com/ScriptReference/CursorLockMode.html
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        else
+        {
+            //表示
+            Cursor.lockState = CursorLockMode.None;
+        }
+    }
+
+
+    /// <summary>
+    /// 銃の切り替えキー入力を検知する
+    /// </summary>
+    public void SwitchingGuns()
+    {
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0f)
+        {
+            selectedGun++;//扱う銃を管理する数値を増やす
+
+            //リストより大きい数値になっていないか確認
+            if (selectedGun >= guns.Count)
+            {
+                selectedGun = 0;//リストより大きな数値になれば０に戻す
+            }
+
+            //実際に武器を切り替える関数
+            switchGun();
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0f)
+        {
+            selectedGun--;//扱う銃を管理する数値を減らす
+
+
+            if (selectedGun < 0)
+            {
+                selectedGun = guns.Count - 1;//0より小さければリストの最大数－１の数値に設定する
+            }
+
+            //実際に武器を切り替える関数
+            switchGun();
+        }
+
+    }
+    /// <summary>
+    /// 銃の切り替え
+    /// </summary>
+    void switchGun()
+    {
+        foreach (Gun gun in guns)//リスト分ループを回す
+        {
+            gun.gameObject.SetActive(false);//銃を非表示
+        }
+
+        guns[selectedGun].gameObject.SetActive(true);//選択中の銃のみ表示
     }
 }
