@@ -70,6 +70,9 @@ public class playercontroller : MonoBehaviour
         //銃の切り替え
         SwitchingGuns();
 
+        //覗き込み
+        Aim();
+
         //カーソル非表示
         UpdateCursorLock();
     }
@@ -225,6 +228,19 @@ public class playercontroller : MonoBehaviour
             switchGun();
         }
 
+        //数値キーの入力検知で武器を切り替える
+        for (int i = 0; i < guns.Count; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))//ループの数値＋１をして文字列に変換。その後、押されたか判定
+            {
+                selectedGun = i;//銃を扱う数値を設定
+
+                //実際に武器を切り替える関数
+                switchGun();
+
+            }
+        }
+
     }
     /// <summary>
     /// 銃の切り替え
@@ -237,5 +253,22 @@ public class playercontroller : MonoBehaviour
         }
 
         guns[selectedGun].gameObject.SetActive(true);//選択中の銃のみ表示
+    }
+
+    /// <summary>
+    /// 右クリックで覗き込み
+    /// </summary>
+    public void Aim()
+    {
+        //  マウス右ボタン押しているとき
+        if (Input.GetMouseButton(1))
+        {
+            //fieldOfViewコンポーネントの値を変更(開始地点、目的地点、補完数値)　　開始地点から目的地点まで補完数値の割合で徐々に近づける
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, guns[selectedGun].adsZoom, guns[selectedGun].adsSpeed * Time.deltaTime);
+        }
+        else
+        {   //60は初期設定数値
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, 60f, guns[selectedGun].adsSpeed * Time.deltaTime);
+        }
     }
 }
