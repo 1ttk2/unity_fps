@@ -30,9 +30,22 @@ public class playercontroller : MonoBehaviour
     private bool cursorLock = true;//カーソルの表示/非表示 
 
 
-
     public List<Gun> guns = new List<Gun>();//武器の格納配列
     private int selectedGun = 0;//選択中の武器管理用数値
+
+
+    private float shotTimer;//射撃間隔
+    [Tooltip("所持弾薬")]
+    public int[] ammunition;
+    [Tooltip("最高所持弾薬数")]
+    public int[] maxAmmunition;
+    [Tooltip("マガジン内の弾数")]
+    public int[] ammoClip;
+    [Tooltip("マガジンに入る最大の数")]
+    public int[] maxAmmoClip;
+
+
+    public GameObject bulletImpact;//弾痕オブジェクト
 
 
     private void Start()
@@ -72,6 +85,9 @@ public class playercontroller : MonoBehaviour
 
         //覗き込み
         Aim();
+
+        //射撃関数
+        Fire();
 
         //カーソル非表示
         UpdateCursorLock();
@@ -240,8 +256,8 @@ public class playercontroller : MonoBehaviour
 
             }
         }
-
     }
+
     /// <summary>
     /// 銃の切り替え
     /// </summary>
@@ -254,6 +270,8 @@ public class playercontroller : MonoBehaviour
 
         guns[selectedGun].gameObject.SetActive(true);//選択中の銃のみ表示
     }
+
+
 
     /// <summary>
     /// 右クリックで覗き込み
@@ -270,5 +288,52 @@ public class playercontroller : MonoBehaviour
         {   //60は初期設定数値
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, 60f, guns[selectedGun].adsSpeed * Time.deltaTime);
         }
+    }
+
+
+
+    /// <summary>
+    /// 左クリックの検知
+    /// </summary>
+    public void Fire()
+    {
+
+        if (Input.GetMouseButton(0) && ammoClip[selectedGun] > 0 && Time.time > shotTimer)
+        {
+            FiringBullet();
+        }
+
+    }
+
+    /// <summary>
+    /// 弾丸の発射
+    /// </summary>
+    private void FiringBullet()
+    {
+        //選択中の銃の弾薬減らす
+        ammoClip[selectedGun]--;
+
+        //Ray(光線)をカメラの中央からに設定
+        Ray ray = cam.ViewportPointToRay(new Vector2(.5f, .5f));//カメラの中心がこの数値
+
+
+        //レイを飛ばす（開始地点と方向、当たったコライダーの情報格納）
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            //Debug.Log("当たったオブジェクトは" + hit.collider.gameObject.name);
+
+            //弾痕エフェクト (hit.pointはコライダーにヒットした位置)：hit.point + (hit.normal * .002f)はちらつかないように少し上にしている
+            //hit normalは当たったオブジェクトに対して直角の方向が返される
+            //LookRotationは指定した方向に回す
+            GameObject bulletImpactObject = Instantiate(guns[selectedGun].bulletImpact, hit.point + (hit.normal * .002f), Quaternion.LookRotation(hit.normal, Vector3.up));
+
+            //時間経過で消えるようにする
+            Destroy(bulletImpactObject, 10f);
+        }
+
+        //射撃間隔を設定
+        shotTimer = Time.time + guns[selectedGun].shootInterval;
+
+
     }
 }
