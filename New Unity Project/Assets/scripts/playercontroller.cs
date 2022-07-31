@@ -48,6 +48,15 @@ public class playercontroller : MonoBehaviour
     public GameObject bulletImpact;//弾痕オブジェクト
 
 
+    UIManager uIManager;//UI管理
+
+    private void Awake()
+    {
+        //タグからUIManagerを探す
+        uIManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
+    }
+
+
     private void Start()
     {
         //変数にメインカメラを格納
@@ -86,11 +95,21 @@ public class playercontroller : MonoBehaviour
         //覗き込み
         Aim();
 
+        //リロード関数
+        Reload();
+
         //射撃関数
         Fire();
 
         //カーソル非表示
         UpdateCursorLock();
+    }
+
+    //初期設定では0.02秒ごとに呼ばれる
+    private void FixedUpdate()
+    {
+        //弾薬テキスト更新
+        uIManager.SettingBulletsText(ammoClip[selectedGun], ammunition[selectedGun]);
     }
 
     //Update関数が呼ばれた後に実行される
@@ -335,5 +354,29 @@ public class playercontroller : MonoBehaviour
         shotTimer = Time.time + guns[selectedGun].shootInterval;
 
 
+    }
+
+    /// <summary>
+    /// リロード
+    /// </summary>
+    private void Reload()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            //リロードで補充する弾数を取得する
+            int amountNeed = maxAmmoClip[selectedGun] - ammoClip[selectedGun];
+
+            //必要な弾薬量と所持弾薬量を比較
+            int ammoAvailable = amountNeed < ammunition[selectedGun] ? amountNeed : ammunition[selectedGun];
+
+            //弾薬が満タンの時はリロードできない&弾薬を所持しているとき
+            if (amountNeed != 0 && ammunition[selectedGun] != 0)
+            {
+                //所持弾薬からリロードする弾薬分を引く
+                ammunition[selectedGun] -= ammoAvailable;
+                //銃に装填する
+                ammoClip[selectedGun] += ammoAvailable;
+            }
+        }
     }
 }
