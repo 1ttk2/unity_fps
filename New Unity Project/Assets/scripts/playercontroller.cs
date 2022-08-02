@@ -50,10 +50,15 @@ public class playercontroller : MonoBehaviour
 
     UIManager uIManager;//UI管理
 
+    SpawnManager spawnManager;//スポーンマネージャー管理
+
     private void Awake()
     {
         //タグからUIManagerを探す
         uIManager = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
+
+        //タグからSpawnManagerを探す
+        spawnManager = GameObject.FindGameObjectWithTag("SpawnManager").GetComponent<SpawnManager>();
     }
 
 
@@ -69,6 +74,9 @@ public class playercontroller : MonoBehaviour
 
         //カーソル非表示
         UpdateCursorLock();
+
+        //ランダムな位置でスポーンさせる
+        transform.position = spawnManager.GetSpawnPoint().position;
     }
 
     private void Update()
