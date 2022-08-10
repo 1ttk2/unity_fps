@@ -1,8 +1,8 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
+using Photon.Realtime;
 
 //photonViewと、PUNが呼び出すことのできるすべてのコールバック/イベントを提供します。使用したいイベント/メソッドをオーバーライドしてください。
 public class PhotonManager : MonoBehaviourPunCallbacks
@@ -10,12 +10,16 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     //よく見るドキュメントページ
     //https://doc-api.photonengine.com/ja-jp/pun/current/class_photon_1_1_pun_1_1_photon_network.html
     //https://doc-api.photonengine.com/ja-jp/pun/current/class_photon_1_1_pun_1_1_mono_behaviour_pun_callbacks.html
-
+    //https://doc-api.photonengine.com/ja-jp/pun/current/namespace_photon_1_1_realtime.html
 
     public static PhotonManager instance;//static
     public GameObject loadingPanel;//ロードパネル
     public Text loadingText;//ロードテキスト
     public GameObject buttons;//ボタン
+
+
+    public GameObject createRoomPanel;//ルーム作成パネル
+    public Text enterRoomName;//入力されたルーム名テキスト
 
 
     private void Awake()
@@ -50,6 +54,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         loadingPanel.SetActive(false);//ロードパネル非表示
 
         buttons.SetActive(false);//ボタン非表示
+
+        createRoomPanel.SetActive(false);//ルーム作成パネル
     }
 
 
@@ -64,9 +70,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.JoinLobby();//マスターサーバー上で、デフォルトロビーに入ります
 
-        loadingText.text = "ロビーへの参加中...";//テキスト更新
+        loadingText.text = "ロビーへの参加...";//テキスト更新
 
     }
+
 
     /// <summary>
     /// マスターサーバーのロビーに入るときに呼び出されます。
@@ -84,5 +91,32 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         CloseMenuUI();
         buttons.SetActive(true);
+    }
+
+    //タイトルの部屋作成ボタン押下時に呼ぶ：UIから呼び出す
+    public void OpenCreateRoomPanel()
+    {
+        CloseMenuUI();
+        createRoomPanel.SetActive(true);
+    }
+
+    //部屋作成ボタン押下時に呼ぶ：UIから呼び出す
+    public void CreateRoomButton()
+    {
+        //インプットフィールドのテキストに何か入力されていた場合
+        if (!string.IsNullOrEmpty(enterRoomName.text))
+        {
+            //ルームのオプションをインスタンス化して変数に入れる 
+            RoomOptions options = new RoomOptions();
+            options.MaxPlayers = 6;// プレイヤーの最大参加人数の設定（無料版は20まで。1秒間にやり取りできるメッセージ数に限りがあるので10以上は難易度上がる）
+
+            //ルームを作る(ルーム名：部屋の設定)
+            PhotonNetwork.CreateRoom(enterRoomName.text, options);
+
+
+            CloseMenuUI();//メニュー閉じる
+            loadingText.text = "ルーム作成中...";
+            loadingPanel.SetActive(true);
+        }
     }
 }
