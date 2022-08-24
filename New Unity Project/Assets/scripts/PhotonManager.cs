@@ -26,6 +26,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public Text roomName;//ルーム名テキスト
 
 
+    public GameObject errorPanel;//エラーパネル
+    public Text errorText;//エラーテキスト
+
+
     private void Awake()
     {
         instance = this;//格納
@@ -62,6 +66,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         createRoomPanel.SetActive(false);//ルーム作成パネル
 
         roomPanel.SetActive(false);//ルームパネル
+
+        errorPanel.SetActive(false);//エラーパネル
     }
 
 
@@ -154,5 +160,13 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         LobbyMenuDisplay();
+    }
+
+    //サーバーがルームを作成できなかったときに呼び出されます。
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        errorText.text = "ルームの作成に失敗しました" + message;
+        CloseMenuUI();
+        errorPanel.SetActive(true);
     }
 }
