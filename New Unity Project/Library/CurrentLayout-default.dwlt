@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 2560
     height: 1357.3334
   m_ShowMode: 4
-  m_Title: Hierarchy
+  m_Title: Game
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -169,8 +169,8 @@ MonoBehaviour:
     y: 0
     width: 1043
     height: 1307
-  m_MinSize: {x: 201, y: 442}
-  m_MaxSize: {x: 4001, y: 8042}
+  m_MinSize: {x: 201, y: 421}
+  m_MaxSize: {x: 4001, y: 8021}
   vertical: 1
   controlID: 17
 --- !u!114 &8
@@ -220,8 +220,8 @@ MonoBehaviour:
     y: 513
     width: 1043
     height: 794
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
@@ -616,7 +616,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 4cfbffffb83f0000f03f0000
+      m_ExpandedIDs: c8e8ffffece8ffffd8f8ffffdcf8ffff4cfbffff903f0000ae3f0000b83f0000f03f00005e400000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -678,21 +678,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts
+    - Assets/Prefabs
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/Prefabs
   m_LastFoldersGridSize: -1
   m_LastProjectPath: "D:\\FPS\u4F5C\u6210\\New Unity Project"
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 12410000
-    m_LastClickedID: 16658
+    m_SelectedIDs: 0c410000
+    m_LastClickedID: 16652
     m_ExpandedIDs: 00000000fa400000fc400000fe400000004100000241000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0

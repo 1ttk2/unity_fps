@@ -33,6 +33,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public GameObject roomListPanel;//ルーム一覧パネル
 
 
+    public Room originalRoomButton;//ルームボタン格納
+    public GameObject roomButtonContent;//ルームボタンの親オブジェクト
+    Dictionary<string, RoomInfo> roomsList = new Dictionary<string, RoomInfo>();//ルームの情報を扱う辞書
+    private List<Room> allRoomButtons = new List<Room>();//ルームボタンを扱うリスト
+
+
     private void Awake()
     {
         instance = this;//格納
@@ -98,7 +104,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()//
     {
 
-        LobbyMenuDisplay();//
+        LobbyMenuDisplay();
+
+
+        roomsList.Clear();//辞書の初期化
 
     }
 
@@ -181,6 +190,52 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         CloseMenuUI();
         roomListPanel.SetActive(true);
+
+    }
+
+
+    //Master Serverのロビーにいる間に、ルームリストを更新するために呼び出されます。
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)//
+    {
+        UpdateRoomList(roomList);//ルーム情報を辞書に格納
+    }
+
+    //ルームの情報を辞書に
+    public void UpdateRoomList(List<RoomInfo> roomList)
+    {
+        for (int i = 0; i < roomList.Count; i++)//ルームの数分ループ
+        {
+            RoomInfo info = roomList[i];//ルーム情報を変数に格納
+
+            if (info.RemovedFromList)//ロビーで使用され、リストされなくなった部屋をマークします（満室、閉鎖、または非表示）
+            {
+                roomsList.Remove(info.Name);//辞書から削除
+            }
+            else
+            {
+                roomsList[info.Name] = info;//ルーム名をキーにして、辞書に追加
+            }
+        }
+
+        RoomListDisplay(roomsList);//辞書にあるすべてのルームを表示
+    }
+
+    //ルーム表示
+    void RoomListDisplay(Dictionary<string, RoomInfo> cachedRoomList)
+    {
+        //辞書のキー/値　でforeachを回す
+        foreach (var roomInfo in cachedRoomList)
+        {
+            //ルームボタン作成
+            Room newButton = Instantiate(originalRoomButton);
+            //生成したボタンにルームの情報を設定
+            newButton.RegisterRoomDetails(roomInfo.Value);
+            //生成したボタンに親の設定
+            newButton.transform.SetParent(roomButtonContent.transform);
+            //リストに追加
+            allRoomButtons.Add(newButton);
+        }
+
 
     }
 }

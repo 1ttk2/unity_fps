@@ -1534,6 +1534,8 @@ MonoBehaviour:
   errorPanel: {fileID: 1600678411}
   errorText: {fileID: 675268833}
   roomListPanel: {fileID: 938716796}
+  originalRoomButton: {fileID: 487669694983018324, guid: 3023306a7b32e2841ac3eaed9fb0b8b8, type: 3}
+  roomButtonContent: {fileID: 601558859}
 --- !u!1 &1225176249
 GameObject:
   m_ObjectHideFlags: 0
